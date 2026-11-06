@@ -39,6 +39,23 @@ namespace PizzaApi.Migrations
                         .HasName("pk_ingredients");
 
                     b.ToTable("ingredients", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "żółty ser"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "sos pomidorowy"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "pieczarki"
+                        });
                 });
 #pragma warning restore 612, 618
         }
