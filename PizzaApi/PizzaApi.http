@@ -16,3 +16,13 @@ Content-Type: application/json
   "Password" : "haslo"
 }
 ###
+
+POST {{PizzaApi_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "Name" : "Kulfon",
+  "Password" : "haslo"
+}
+
+###

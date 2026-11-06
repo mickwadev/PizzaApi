@@ -35,8 +35,19 @@ public static class AuthApi
                 return Results.Ok($"User {request.Name} created OK");
             });
 
-            auth.MapPost("/login", (LoginUserRequestDto request, PizzaDbContext dbContext) => 
-            { 
+            auth.MapPost("/login", async (LoginUserRequestDto request, PizzaDbContext dbContext) => 
+            {
+                User? exisingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
+                // if user does not exist, fake password check anyway for security reason,
+                // so attacker does know if user exists or not by responce time
+                string hashToCheck = exisingUser != null? exisingUser.HashedPassword : "some random string";
+                var result = new PasswordHasher<User>().VerifyHashedPassword(exisingUser, hashToCheck, request.Password);
+
+                if(result == PasswordVerificationResult.Success)
+                {
+                    return Results.Ok("^_^");
+                }
+                return Results.Unauthorized();
             });
         }
     }
