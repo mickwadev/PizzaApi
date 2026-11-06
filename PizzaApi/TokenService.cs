@@ -55,5 +55,15 @@ public class TokenService(PizzaDbContext dbContext,
         return Convert.ToBase64String(random);
     }
 
+    // This works like this: user gets not hashed rt, Db stores hased rt
+    // Then user sends to /refreshed not hashed version.
+    // This hash will be same
+    public static string HashRefreshToken(string refreshToken)
+    {
+        using var sha256 = SHA256.Create();
+        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+        return Convert.ToBase64String(hashedBytes);
+    }
+
 
 }

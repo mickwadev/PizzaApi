@@ -3,11 +3,25 @@ using Microsoft.EntityFrameworkCore;
 using PizzaApi.Data;
 using PizzaApi.DTOs;
 using PizzaApi.Entities;
+using PizzaApi.Migrations;
 
 namespace PizzaApi.Extensions;
 
 public static class AuthApi
 {
+    private static UserRefreshToken CreateToken(string refreshToken, int userId)
+    {
+        return new()
+        {
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            DeviceInfo = "Test", // later Maui app or web
+            HashedToken = TokenService.HashRefreshToken(refreshToken),
+            Revoked = false,
+            UserId = userId
+        };
+    }
+
     extension(WebApplication webApplication)
     {
         public void MapAuthApi()
@@ -52,15 +66,7 @@ public static class AuthApi
                 }
 
                 var tokens = tokenService.Generate(exisingUser);
-                UserRefreshToken urt = new()
-                { 
-                    CreatedAt = DateTime.UtcNow,
-                    ExpiresAt = DateTime.UtcNow.AddDays(7),
-                    DeviceInfo = "Test", // later Maui app or web
-                    HashedToken = tokens.refreshToken,
-                    Revoked = false,
-                    UserId = exisingUser.Id
-                };
+                UserRefreshToken urt = CreateToken(tokens.refreshToken, exisingUser.Id);
 
                 dbContext.Add(urt);
                 await dbContext.SaveChangesAsync();
@@ -68,6 +74,30 @@ public static class AuthApi
                     tokens.jwt,
                     tokens.refreshToken
                 ));
+            });
+
+            auth.MapPost("/refresh", async (RefreshUserRequestDto request,
+                PizzaDbContext dbContext, TokenService tokenService) =>
+            {
+                // Check if there is not used, not outdated rt in db:
+                var hashedRefreshToken = TokenService.HashRefreshToken(request.RefreshToken);
+                DateTime now = DateTime.UtcNow;
+                UserRefreshToken? validToken = await dbContext.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.HashedToken == hashedRefreshToken && rt.Revoked == false &&
+                 rt.ExpiresAt > now);
+
+                if (validToken is null)
+                {
+                    return Results.Unauthorized();
+                }
+                // if there is found token, search for its owner, create and return new tokens
+                User tokenOwner = await dbContext.Users.FindAsync(validToken.UserId);
+                var tokens =  tokenService.Generate(tokenOwner);
+                var rt = CreateToken(tokens.refreshToken, tokenOwner.Id);
+                validToken.Revoked = true;
+                dbContext.RefreshTokens.Add(rt);
+                await dbContext.SaveChangesAsync();
+                return Results.Ok(new LoginUserResponseDto(tokens.jwt,tokens.refreshToken));
             });
         }
     }

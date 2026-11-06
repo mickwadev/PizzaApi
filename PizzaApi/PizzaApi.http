@@ -26,3 +26,12 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{PizzaApi_HostAddress}}/auth/refresh
+Content-Type: application/json
+
+{
+  "RefreshToken" : "PaQ84T2OO8rGog=="
+}
+
+###
