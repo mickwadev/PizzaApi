@@ -57,6 +57,31 @@ namespace PizzaApi.Migrations
                             Name = "pieczarki"
                         });
                 });
+
+            modelBuilder.Entity("PizzaApi.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HashedPassword")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("hashed_password");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_users");
+
+                    b.ToTable("users", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

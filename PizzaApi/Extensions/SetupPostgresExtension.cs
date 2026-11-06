@@ -10,6 +10,7 @@ public static class SetupPostgresExtension
     {
         public void AddMyPostgresDbContext()
         {
+            var dbPassword = builder.Configuration["db:password"] ?? throw new Exception("Missing db password");
             var csb = new NpgsqlConnectionStringBuilder(
             builder.Configuration.GetConnectionString("PizzaPostgresDb"))
             { 

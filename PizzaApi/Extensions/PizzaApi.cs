@@ -3,7 +3,7 @@ using PizzaApi.Data;
 
 namespace PizzaApi.Extensions;
 
-public static class PizzaApiExtension
+public static class PizzaApi
 {
     extension(WebApplication webApplication)
     {

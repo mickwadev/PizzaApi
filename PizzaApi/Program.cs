@@ -27,6 +27,7 @@ namespace PizzaApi
 
             app.UseAuthorization();
             app.MapPizzaApi();
+            app.MapAuthApi();
             app.Run();
         }
     }
