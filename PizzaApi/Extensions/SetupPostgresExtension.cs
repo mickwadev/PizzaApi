@@ -20,6 +20,10 @@ public static class SetupPostgresExtension
             builder.Services
                 .AddDbContext<PizzaDbContext>(options => options
                 .UseNpgsql(csb.ConnectionString)
+#if DEBUG
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors()
+#endif
                 .UseSnakeCaseNamingConvention());
         }
     }

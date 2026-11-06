@@ -7,3 +7,12 @@
 GET {{PizzaApi_HostAddress}}/pizza/ingredients
 
 ###
+
+POST {{PizzaApi_HostAddress}}/auth/create
+Content-Type: application/json
+
+{
+  "Name" : "Kulfon",
+  "Password" : "haslo"
+}
+###
