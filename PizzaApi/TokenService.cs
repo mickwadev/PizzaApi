@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using PizzaApi.Data;
 using PizzaApi.Entities;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace PizzaApi;
@@ -12,6 +13,13 @@ namespace PizzaApi;
 public class TokenService(PizzaDbContext dbContext,
     IConfiguration configuration)
 {
+
+    public (string jwt, string refreshToken) Generate(User user)
+    {
+        var jwt = GenerateAccessToken(user);
+        var refreshToken = GenerateRefreshToken();
+        return (jwt, refreshToken);
+    }
 
     private string GenerateAccessToken(User user)
     {
@@ -37,5 +45,15 @@ public class TokenService(PizzaDbContext dbContext,
         };
         return new JsonWebTokenHandler().CreateToken(tokenDescriptor);
     }
+
+    private string GenerateRefreshToken()
+    {
+        // Refresh token does not have any date time inside
+        using var g = RandomNumberGenerator.Create();
+        var random = new byte[10];
+        g.GetBytes(random);
+        return Convert.ToBase64String(random);
+    }
+
 
 }

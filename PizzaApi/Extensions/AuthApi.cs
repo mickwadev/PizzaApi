@@ -35,7 +35,10 @@ public static class AuthApi
                 return Results.Ok($"User {request.Name} created OK");
             });
 
-            auth.MapPost("/login", async (LoginUserRequestDto request, PizzaDbContext dbContext) => 
+            auth.MapPost("/login", async (
+                LoginUserRequestDto request,
+                TokenService tokenService,
+                PizzaDbContext dbContext) => 
             {
                 User? exisingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
                 // if user does not exist, fake password check anyway for security reason,
@@ -43,11 +46,28 @@ public static class AuthApi
                 string hashToCheck = exisingUser != null? exisingUser.HashedPassword : "some random string";
                 var result = new PasswordHasher<User>().VerifyHashedPassword(exisingUser, hashToCheck, request.Password);
 
-                if(result == PasswordVerificationResult.Success)
+                if(result != PasswordVerificationResult.Success)
                 {
-                    return Results.Ok("^_^");
+                    return Results.Unauthorized();
                 }
-                return Results.Unauthorized();
+
+                var tokens = tokenService.Generate(exisingUser);
+                UserRefreshToken urt = new()
+                { 
+                    CreatedAt = DateTime.UtcNow,
+                    ExpiresAt = DateTime.UtcNow.AddDays(7),
+                    DeviceInfo = "Test", // later Maui app or web
+                    HashedToken = tokens.refreshToken,
+                    Revoked = false,
+                    UserId = exisingUser.Id
+                };
+
+                dbContext.Add(urt);
+                await dbContext.SaveChangesAsync();
+                return Results.Ok(new LoginUserResponseDto(             
+                    tokens.jwt,
+                    tokens.refreshToken
+                ));
             });
         }
     }
