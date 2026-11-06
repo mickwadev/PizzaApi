@@ -7,6 +7,7 @@ public class PizzaDbContext(DbContextOptions<PizzaDbContext> options):DbContext(
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PizzaDbContext).Assembly);
     }
 
