@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PizzaApi.Data;
 using PizzaApi.DTOs;
@@ -28,14 +29,14 @@ public static class AuthApi
         {
             var auth = webApplication.MapGroup("/auth");
 
-            auth.MapPost("/create", async (CreateUserRequestDto request, PizzaDbContext dbContext) => 
+            auth.MapPost("/create", async Task<Results<BadRequest<string>, Ok<string>>> (CreateUserRequestDto request, PizzaDbContext dbContext) => 
             {
                 // First check if no such user is in db:
                 User? foundUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
 
                 if (foundUser is not null)
                 {
-                    return Results.BadRequest($"User {request.Name} already exists");
+                    return TypedResults.BadRequest($"User {request.Name} already exists");
                 }
 
                 // no found user? Create one:
@@ -49,7 +50,7 @@ public static class AuthApi
                 return TypedResults.Ok($"User {request.Name} created OK");
             });
 
-            auth.MapPost("/login", async (
+            auth.MapPost("/login", async Task<Results<Ok<LoginUserResponseDto>, UnauthorizedHttpResult>> (
                 LoginUserRequestDto request,
                 TokenService tokenService,
                 PizzaDbContext dbContext) => 
@@ -62,7 +63,7 @@ public static class AuthApi
 
                 if(result != PasswordVerificationResult.Success)
                 {
-                    return Results.Unauthorized();
+                    return TypedResults.Unauthorized();
                 }
 
                 var tokens = tokenService.Generate(exisingUser);
@@ -70,13 +71,13 @@ public static class AuthApi
 
                 dbContext.Add(urt);
                 await dbContext.SaveChangesAsync();
-                return Results.Ok(new LoginUserResponseDto(             
+                return TypedResults.Ok(new LoginUserResponseDto(             
                     tokens.jwt,
                     tokens.refreshToken
                 ));
             });
 
-            auth.MapPost("/refresh", async (RefreshUserRequestDto request,
+            auth.MapPost("/refresh", async Task<Results<UnauthorizedHttpResult,Ok<LoginUserResponseDto>>> (RefreshUserRequestDto request,
                 PizzaDbContext dbContext, TokenService tokenService) =>
             {
                 // Check if there is not used, not outdated rt in db:
@@ -88,7 +89,7 @@ public static class AuthApi
 
                 if (validToken is null)
                 {
-                    return Results.Unauthorized();
+                    return TypedResults.Unauthorized();
                 }
                 // if there is found token, search for its owner, create and return new tokens
                 User tokenOwner = await dbContext.Users.FindAsync(validToken.UserId);
