@@ -14,7 +14,7 @@ public static class PizzaApi
             {
                var all = await dbContext.Ingredients.AsNoTracking().ToListAsync();
                 return Results.Ok(all);
-            });
+            }).RequireAuthorization();
         }
     }
 }

@@ -38,7 +38,7 @@ public class TokenService(PizzaDbContext dbContext,
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-           // Expires = issuedAt.AddMinutes(30),
+            Expires = DateTime.Now.AddMinutes(10),
             SigningCredentials = credentials,
             Issuer = jwtSettings["Issuer"],
             Audience = jwtSettings["Audience"]

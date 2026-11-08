@@ -3,9 +3,11 @@
  
 
 ###
+# test token must be without ""
+@jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJKV1RaYWJhd3lBcGkiLCJpc3MiOiJKV1RaYWJhd3lTZXJ2ZXIiLCJleHAiOjE3OTQxMzk1ODEsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJLdWxmb24iLCJHcnp5YmVrIjoiQm9yb3dpayIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkN1c3RvbWVyIiwiaWF0IjoxNzk0MTM4OTgxLCJuYmYiOjE3OTQxMzg5ODF9.jjNpmuJdz0BbIdMsE2hwDVp5gNTnKL7ltxIoLIQvrjA
 
 GET {{PizzaApi_HostAddress}}/pizza/ingredients
-
+Authorization: Bearer {{jwt}}
 ###
 
 POST {{PizzaApi_HostAddress}}/auth/create

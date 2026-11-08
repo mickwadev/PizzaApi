@@ -1,5 +1,9 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using PizzaApi.Extensions;
+using Scalar.AspNetCore;
+using System.Text;
 
 namespace PizzaApi
 {
@@ -9,19 +13,42 @@ namespace PizzaApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddAuthorization();
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                // https://milanjovanovic.tech/blog/jwt-authentication-aspnetcore
+            }).AddJwtBearer(options =>
+            {
+                // z tym trzeba uważać, bo to wpływa na mapowanie nazw i nie działa potem sub czy coś...
+                options.MapInboundClaims = false;
+                var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+                var secret = builder.Configuration["jwt:secret"] ?? throw new Exception("Missing jwt secret");
+                // https://www.youtube.com/watch?v=3S8wQnquxp8 
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+                    ClockSkew = TimeSpan.Zero // Remove delay of token expiration
+                };
+            });
+
             builder.Services.AddOpenApi();
             builder.AddMyPostgresDbContext();
             builder.Services.AddScoped<TokenService>();
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.MapScalarApiReference();
             }
 
             app.UseHttpsRedirection();
