@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PizzaApi.Data;
+using PizzaApi.DTOs;
 
 namespace PizzaApi.Extensions;
 
@@ -10,11 +11,13 @@ public static class PizzaApi
         public void MapPizzaApi()
         {
             var pizzaApi = webApplication.MapGroup("/pizza");
-            pizzaApi.MapGet("/ingredients", async(PizzaDbContext dbContext) =>
+            pizzaApi.MapGet("/ingredients", async (PizzaDbContext dbContext) =>
             {
-               var all = await dbContext.Ingredients.AsNoTracking().ToListAsync();
-                return Results.Ok(all);
-            }).RequireAuthorization();
+                var all = await dbContext.Ingredients.AsNoTracking().ToListAsync();
+                return TypedResults.Ok(all.Select(ing => new IngredientDto(ing.Name)));
+            });//.RequireAuthorization();
         }
     }
 }
+
+            

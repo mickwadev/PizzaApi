@@ -46,7 +46,7 @@ public static class AuthApi
                 newUser.HashedPassword = hashedPassword;
                 dbContext.Users.Add(newUser);
                 await dbContext.SaveChangesAsync();
-                return Results.Ok($"User {request.Name} created OK");
+                return TypedResults.Ok($"User {request.Name} created OK");
             });
 
             auth.MapPost("/login", async (
@@ -97,7 +97,7 @@ public static class AuthApi
                 validToken.Revoked = true;
                 dbContext.RefreshTokens.Add(rt);
                 await dbContext.SaveChangesAsync();
-                return Results.Ok(new LoginUserResponseDto(tokens.jwt,tokens.refreshToken));
+                return TypedResults.Ok(new LoginUserResponseDto(tokens.jwt,tokens.refreshToken));
             });
         }
     }
