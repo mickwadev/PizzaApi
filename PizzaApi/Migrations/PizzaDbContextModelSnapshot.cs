@@ -73,6 +73,12 @@ namespace PizzaApi.Migrations
                         .HasColumnType("text")
                         .HasColumnName("hashed_password");
 
+                    b.Property<int>("MyRoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("my_role_id");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
@@ -80,6 +86,12 @@ namespace PizzaApi.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_users_id");
+
+                    b.HasIndex("MyRoleId")
+                        .HasDatabaseName("ix_users_my_role_id");
 
                     b.ToTable("users", (string)null);
                 });
@@ -123,6 +135,59 @@ namespace PizzaApi.Migrations
                         .HasName("pk_refresh_tokens");
 
                     b.ToTable("refresh_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("PizzaApi.Entities.UserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(42)
+                        .HasColumnType("character varying(42)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_roles");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_user_roles_id");
+
+                    b.ToTable("user_roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Customer"
+                        });
+                });
+
+            modelBuilder.Entity("PizzaApi.Entities.User", b =>
+                {
+                    b.HasOne("PizzaApi.Entities.UserRole", "MyRole")
+                        .WithMany("Users")
+                        .HasForeignKey("MyRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_users_user_roles_my_role_id");
+
+                    b.Navigation("MyRole");
+                });
+
+            modelBuilder.Entity("PizzaApi.Entities.UserRole", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

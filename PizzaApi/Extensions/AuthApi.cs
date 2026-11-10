@@ -104,6 +104,10 @@ public static class AuthApi
                 await dbContext.SaveChangesAsync();
                 return TypedResults.Ok(new LoginUserResponseDto(tokens.jwt,tokens.refreshToken));
             });
+
+            auth.MapDelete("/delete", async () => 
+            { 
+            });
         }
     }
 }
