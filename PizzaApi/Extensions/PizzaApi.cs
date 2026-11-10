@@ -15,7 +15,17 @@ public static class PizzaApi
             {
                 var all = await dbContext.Ingredients.AsNoTracking().ToListAsync();
                 return TypedResults.Ok(all.Select(ing => new IngredientDto(ing.Name)));
-            });//.RequireAuthorization();
+            }).RequireAuthorization();
+
+            pizzaApi.MapGet("/panmors", () =>
+            {
+                return TypedResults.Ok("Pan Mors :3=");
+            });
+
+            pizzaApi.MapGet("/ziemniaczek", () => 
+            {
+                return TypedResults.Ok("ziemniaczek 🥔 ^_^");
+            });
         }
     }
 }

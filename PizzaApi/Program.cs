@@ -52,7 +52,12 @@ namespace PizzaApi
             }
 
             app.UseHttpsRedirection();
-
+            // This will be executed on each api call
+            app.Use(async (context, next) => 
+            {
+              //  await context.Response.WriteAsync("test");
+                await next.Invoke(context);
+            }); 
             app.UseAuthorization();
             app.MapPizzaApi();
             app.MapAuthApi();

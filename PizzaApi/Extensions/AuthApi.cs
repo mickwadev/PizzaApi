@@ -50,6 +50,7 @@ public static class AuthApi
                 return TypedResults.Ok($"User {request.Name} created OK");
             });
 
+            // 401 - kiedy login/hasło jest złe
             auth.MapPost("/login", async Task<Results<Ok<LoginUserResponseDto>, UnauthorizedHttpResult>> (
                 LoginUserRequestDto request,
                 TokenService tokenService,
@@ -77,6 +78,9 @@ public static class AuthApi
                 ));
             });
 
+
+            // 401 - kiedy refresh token jest niepoprawny
+            // todo: kiedy będzie drugi raz użyty ten sam refresh token anulować wszystkie tokeny
             auth.MapPost("/refresh", async Task<Results<UnauthorizedHttpResult,Ok<LoginUserResponseDto>>> (RefreshUserRequestDto request,
                 PizzaDbContext dbContext, TokenService tokenService) =>
             {
