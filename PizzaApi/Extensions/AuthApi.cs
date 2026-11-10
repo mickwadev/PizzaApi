@@ -98,7 +98,8 @@ public static class AuthApi
                     return TypedResults.Unauthorized();
                 }
                 // if there is found token, search for its owner, create and return new tokens
-                User tokenOwner = await dbContext.Users.FindAsync(validToken.UserId);
+                User tokenOwner = await dbContext.Users
+                .Include(u => u.MyRole).FirstOrDefaultAsync(u => u.Id == validToken.UserId);
                 var tokens =  tokenService.Generate(tokenOwner);
                 var rt = CreateRefreshToken(tokens.refreshToken, tokenOwner.Id);
                 validToken.Revoked = true;
