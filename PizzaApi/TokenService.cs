@@ -29,7 +29,8 @@ public class TokenService(PizzaDbContext dbContext,
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Name),
             new("Grzybek","Borowik"), // it looks like anything can be added here
-            new(ClaimTypes.Role,"Customer")
+            new(ClaimTypes.Role,user.MyRole.Name),
+            new("Role",user.MyRole.Name)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwt:secret"]?? throw new Exception("Missing secret key for jwt")));

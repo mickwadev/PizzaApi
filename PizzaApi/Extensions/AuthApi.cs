@@ -10,7 +10,7 @@ namespace PizzaApi.Extensions;
 
 public static class AuthApi
 {
-    private static UserRefreshToken CreateToken(string refreshToken, int userId)
+    private static UserRefreshToken CreateRefreshToken(string refreshToken, int userId)
     {
         return new()
         {
@@ -57,7 +57,8 @@ public static class AuthApi
                 TokenService tokenService,
                 PizzaDbContext dbContext) => 
             {
-                User? exisingUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
+
+                User? exisingUser = await dbContext.Users.Include(u => u.MyRole).FirstOrDefaultAsync(u => u.Name == request.Name);
                 // if user does not exist, fake password check anyway for security reason,
                 // so attacker does know if user exists or not by responce time
                 string hashToCheck = exisingUser != null? exisingUser.HashedPassword : "some random string";
@@ -69,7 +70,7 @@ public static class AuthApi
                 }
 
                 var tokens = tokenService.Generate(exisingUser);
-                UserRefreshToken urt = CreateToken(tokens.refreshToken, exisingUser.Id);
+                UserRefreshToken urt = CreateRefreshToken(tokens.refreshToken, exisingUser.Id);
 
                 dbContext.Add(urt);
                 await dbContext.SaveChangesAsync();
@@ -99,7 +100,7 @@ public static class AuthApi
                 // if there is found token, search for its owner, create and return new tokens
                 User tokenOwner = await dbContext.Users.FindAsync(validToken.UserId);
                 var tokens =  tokenService.Generate(tokenOwner);
-                var rt = CreateToken(tokens.refreshToken, tokenOwner.Id);
+                var rt = CreateRefreshToken(tokens.refreshToken, tokenOwner.Id);
                 validToken.Revoked = true;
                 dbContext.RefreshTokens.Add(rt);
                 await dbContext.SaveChangesAsync();

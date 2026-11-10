@@ -17,6 +17,15 @@ public static class PizzaApi
                 return TypedResults.Ok(all.Select(ing => new IngredientDto(ing.Name)));
             }).RequireAuthorization();
 
+
+            pizzaApi.MapGet("/only_admin", () =>
+            {
+                return TypedResults.Ok("If you see this You are admin");
+            }).RequireAuthorization( policy =>
+            {
+                policy.RequireRole("Admin");
+            });
+
             pizzaApi.MapGet("/panmors", () =>
             {
                 return TypedResults.Ok("Pan Mors :3=");

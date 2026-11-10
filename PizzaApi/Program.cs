@@ -23,6 +23,7 @@ namespace PizzaApi
             }).AddJwtBearer(options =>
             {
                 // z tym trzeba uważać, bo to wpływa na mapowanie nazw i nie działa potem sub czy coś...
+                // jak to jest na 'true' to te nazwy pól w jwt są długie
                 options.MapInboundClaims = false;
                 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
                 var secret = builder.Configuration["jwt:secret"] ?? throw new Exception("Missing jwt secret");
