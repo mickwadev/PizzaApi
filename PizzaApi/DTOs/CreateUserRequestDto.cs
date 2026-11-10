@@ -1,3 +1,3 @@
 ﻿namespace PizzaApi.DTOs;
 
-public record CreateUserRequestDto(string Name, string Password);
+public record CreateUserRequestDto(string Name, int RoleId, string Password);

@@ -37,3 +37,7 @@ Content-Type: application/json
 }
 
 ###
+
+GET {{PizzaApi_HostAddress}}/auth/roles
+
+###

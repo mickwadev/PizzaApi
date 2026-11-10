@@ -45,6 +45,7 @@ public static class AuthApi
                 var hashedPassword = new PasswordHasher<User>().HashPassword(newUser,request.Password);
                 newUser.Name = request.Name;
                 newUser.HashedPassword = hashedPassword;
+                newUser.MyRoleId = request.RoleId;
                 dbContext.Users.Add(newUser);
                 await dbContext.SaveChangesAsync();
                 return TypedResults.Ok($"User {request.Name} created OK");
@@ -107,6 +108,12 @@ public static class AuthApi
 
             auth.MapDelete("/delete", async () => 
             { 
+            });
+
+            auth.MapGet("/roles", async (PizzaDbContext dbContext) => 
+            {
+                var roles = await dbContext.UserRoles.AsNoTracking().ToListAsync();
+                return TypedResults.Ok(roles.Select(r => new UserRoleResponseDto(r.Id, r.Name)));
             });
         }
     }
