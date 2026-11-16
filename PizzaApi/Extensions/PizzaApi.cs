@@ -15,10 +15,12 @@ public static class PizzaApi
             {
                 var all = await dbContext.Ingredients.AsNoTracking().ToListAsync();
                 return TypedResults.Ok(all.Select(ing => new IngredientDto(ing.Name)));
-            });//.RequireAuthorization();
+            }).RequireAuthorization();
 
-
-
+            pizzaApi.MapGet("/spicy_levels", async (PizzaDbContext dbContext) => {
+                var all = await dbContext.SpicyLevels.AsNoTracking().ToListAsync();
+                return TypedResults.Ok(all.Select(sl => new SpicyLevelDto(sl.Id, sl.Description, sl.Lvl)));
+            });
 
             pizzaApi.MapGet("/only_admin", () =>
             {
