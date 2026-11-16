@@ -22,6 +22,11 @@ public static class PizzaApi
                 return TypedResults.Ok(all.Select(sl => new SpicyLevelDto(sl.Id, sl.Description, sl.Lvl)));
             });
 
+            pizzaApi.MapGet("/pizzas", async (PizzaDbContext dbContext) => {
+                var all = await dbContext.Pizzas.AsNoTracking().ToListAsync();
+                return TypedResults.Ok(all.Select(pizza => new PizzaDto(pizza.Id,pizza.Name,pizza.SpicyLevelId, pizza.Price, pizza.Stars)));
+            });
+
             pizzaApi.MapGet("/only_admin", () =>
             {
                 return TypedResults.Ok("If you see this You are admin");
