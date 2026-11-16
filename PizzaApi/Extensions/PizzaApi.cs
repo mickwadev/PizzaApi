@@ -15,7 +15,9 @@ public static class PizzaApi
             {
                 var all = await dbContext.Ingredients.AsNoTracking().ToListAsync();
                 return TypedResults.Ok(all.Select(ing => new IngredientDto(ing.Name)));
-            }).RequireAuthorization();
+            });//.RequireAuthorization();
+
+
 
 
             pizzaApi.MapGet("/only_admin", () =>

@@ -17,4 +17,6 @@ public class PizzaDbContext(DbContextOptions<PizzaDbContext> options):DbContext(
     public DbSet<UserRefreshToken> RefreshTokens { get; set; }
 
     public DbSet<UserRole> UserRoles { get; set; }
+
+    public DbSet<SpicyLevel> SpicyLevels { get; set; }
 }

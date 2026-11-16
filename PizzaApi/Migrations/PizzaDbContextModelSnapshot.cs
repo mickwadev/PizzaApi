@@ -59,6 +59,56 @@ namespace PizzaApi.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PizzaApi.Entities.SpicyLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<int>("Lvl")
+                        .HasColumnType("integer")
+                        .HasColumnName("lvl");
+
+                    b.HasKey("Id")
+                        .HasName("pk_spicy_levels");
+
+                    b.ToTable("spicy_levels", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Łagodny jak Szczerbuś :)",
+                            Lvl = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Lekko ostra",
+                            Lvl = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Średnio ostra",
+                            Lvl = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Bardzo ostra >.<",
+                            Lvl = 5
+                        });
+                });
+
             modelBuilder.Entity("PizzaApi.Entities.User", b =>
                 {
                     b.Property<int>("Id")
