@@ -19,4 +19,5 @@ public class PizzaDbContext(DbContextOptions<PizzaDbContext> options):DbContext(
     public DbSet<UserRole> UserRoles { get; set; }
 
     public DbSet<SpicyLevel> SpicyLevels { get; set; }
+    public DbSet<Pizza> Pizzas { get; set; }
 }

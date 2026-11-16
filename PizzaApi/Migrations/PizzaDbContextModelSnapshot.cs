@@ -59,6 +59,75 @@ namespace PizzaApi.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PizzaApi.Entities.Pizza", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<int>("SpicyLevelId")
+                        .HasColumnType("integer")
+                        .HasColumnName("spicy_level_id");
+
+                    b.Property<int>("Stars")
+                        .HasColumnType("integer")
+                        .HasColumnName("stars");
+
+                    b.HasKey("Id")
+                        .HasName("pk_pizzas");
+
+                    b.HasIndex("SpicyLevelId")
+                        .HasDatabaseName("ix_pizzas_spicy_level_id");
+
+                    b.ToTable("pizzas", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Margherita",
+                            Price = 12.12m,
+                            SpicyLevelId = 1,
+                            Stars = 4
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Fungi",
+                            Price = 12.34m,
+                            SpicyLevelId = 1,
+                            Stars = 5
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "4 sery",
+                            Price = 22.32m,
+                            SpicyLevelId = 2,
+                            Stars = 5
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Piekielne papryczki",
+                            Price = 72.44m,
+                            SpicyLevelId = 4,
+                            Stars = 5
+                        });
+                });
+
             modelBuilder.Entity("PizzaApi.Entities.SpicyLevel", b =>
                 {
                     b.Property<int>("Id")
@@ -223,6 +292,18 @@ namespace PizzaApi.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PizzaApi.Entities.Pizza", b =>
+                {
+                    b.HasOne("PizzaApi.Entities.SpicyLevel", "spicy")
+                        .WithMany("pizzas")
+                        .HasForeignKey("SpicyLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_pizzas_spicy_levels_spicy_level_id");
+
+                    b.Navigation("spicy");
+                });
+
             modelBuilder.Entity("PizzaApi.Entities.User", b =>
                 {
                     b.HasOne("PizzaApi.Entities.UserRole", "MyRole")
@@ -233,6 +314,11 @@ namespace PizzaApi.Migrations
                         .HasConstraintName("fk_users_user_roles_my_role_id");
 
                     b.Navigation("MyRole");
+                });
+
+            modelBuilder.Entity("PizzaApi.Entities.SpicyLevel", b =>
+                {
+                    b.Navigation("pizzas");
                 });
 
             modelBuilder.Entity("PizzaApi.Entities.UserRole", b =>
